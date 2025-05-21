@@ -4,13 +4,10 @@ const taskInput = document.querySelector("#taskInput");
 const tasksList = document.querySelector("#tasksList");
 const emptyList = document.querySelector("#emptyList");
 
-// Добавление задачи
+let tasks = [];
+
 form.addEventListener("submit", addTask);
-
-//Удаление задачи
 tasksList.addEventListener("click", deleteTask);
-
-// Отмечаем задачу завершенной
 tasksList.addEventListener("click", doneTask);
 
 // Функции
@@ -21,9 +18,21 @@ function addTask(event) {
   // Достаем текст задачи из поля ввода
   const taskText = taskInput.value;
 
+  const newTask = {
+    id: Date.now(),
+    text: taskText,
+    done: false,
+  };
+
+  // Добавляем задачу в массив с задачами
+  tasks.push(newTask);
+
+  // Формируем CSS класс
+  const cssClass = newTask.done ? "task-title task-title--done" : "task-title";
+
   // Формируем разметку для нвоой задачи
-  const taskHTML = `<li class="list-group-item d-flex justify-content-between task-item">
-            <span class="task-title">${taskText}</span>
+  const taskHTML = `<li id="${newTask.id}" class="list-group-item d-flex justify-content-between task-item">
+            <span class="${cssClass}">${newTask.text}</span>
             <div class="task-item__buttons">
               <button type="button" data-action="done" class="btn-action">
                 <img
@@ -58,11 +67,12 @@ function addTask(event) {
 }
 
 function deleteTask(event) {
+  // Проверяем если нажатие был НЕ по кнопке "удалить задачу"
+  if (event.target.dataset.action !== "delete") return;
+
   // Проверяем что нажатие был по кнопке "удалить задачу"
-  if (event.target.dataset.action === "delete") {
-    const parentNode = event.target.closest(".list-group-item");
-    parentNode.remove();
-  }
+  const parentNode = event.target.closest(".list-group-item");
+  parentNode.remove();
 
   // Проверка. Если в списке задач более 1-го элемента, скрываем блок "Список дел пуст"
   if (tasksList.children.length === 1) {
@@ -71,11 +81,11 @@ function deleteTask(event) {
 }
 
 function doneTask(event) {
+  // Проверяем что клик был НЕ по кнопке "задача выполнена"
+  if (event.target.dataset.action !== "done") return;
+
   // Проверяем что клик был по кнопке "задача выполнена"
-  if (event.target.dataset.action === "done") {
-    const parentNode = event.target.closest(".list-group-item");
-    const taskTitle = parentNode.querySelector(".task-title");
-    taskTitle.classList.toggle("task-title--done");
-    console.log(taskTitle);
-  }
+  const parentNode = event.target.closest(".list-group-item");
+  const taskTitle = parentNode.querySelector(".task-title");
+  taskTitle.classList.toggle("task-title--done");
 }
