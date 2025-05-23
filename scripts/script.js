@@ -72,6 +72,17 @@ function deleteTask(event) {
 
   // Проверяем что нажатие был по кнопке "удалить задачу"
   const parentNode = event.target.closest(".list-group-item");
+
+  //Определяем ID задачи
+  const id = Number(parentNode.id);
+
+  // Нахдим индекс задачи в массиве
+  const index = tasks.findIndex((task) => task.id === id);
+
+  // Удаляем задачу из массива с задачами
+  tasks.splice(index, 1);
+
+  // Удаляем задачу из разметки
   parentNode.remove();
 
   // Проверка. Если в списке задач более 1-го элемента, скрываем блок "Список дел пуст"
