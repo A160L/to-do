@@ -5,6 +5,7 @@ const tasksList = document.querySelector("#tasksList");
 const emptyList = document.querySelector("#emptyList");
 
 let tasks = [];
+checkEmptyList();
 
 form.addEventListener("submit", addTask);
 tasksList.addEventListener("click", deleteTask);
@@ -18,6 +19,7 @@ function addTask(event) {
   // Достаем текст задачи из поля ввода
   const taskText = taskInput.value;
 
+  //Описываем задачу в виде объекта
   const newTask = {
     id: Date.now(),
     text: taskText,
@@ -60,10 +62,7 @@ function addTask(event) {
   taskInput.value = "";
   taskInput.focus();
 
-  // Проверка. Если в списке задач более 1-го элемента, скрываем блок "Список дел пуст"
-  if (tasksList.children.length > 1) {
-    emptyList.classList.add("none");
-  }
+  checkEmptyList();
 }
 
 function deleteTask(event) {
@@ -76,27 +75,41 @@ function deleteTask(event) {
   //Определяем ID задачи
   const id = Number(parentNode.id);
 
-  // Нахдим индекс задачи в массиве
-  const index = tasks.findIndex((task) => task.id === id);
-
-  // Удаляем задачу из массива с задачами
-  tasks.splice(index, 1);
+  //Удаляем задачу через фильтрацию массива
+  tasks = tasks.filter((task) => task.id !== id);
 
   // Удаляем задачу из разметки
   parentNode.remove();
 
-  // Проверка. Если в списке задач более 1-го элемента, скрываем блок "Список дел пуст"
-  if (tasksList.children.length === 1) {
-    emptyList.classList.remove("none");
-  }
+  checkEmptyList();
 }
 
 function doneTask(event) {
   // Проверяем что клик был НЕ по кнопке "задача выполнена"
   if (event.target.dataset.action !== "done") return;
 
-  // Проверяем что клик был по кнопке "задача выполнена"
   const parentNode = event.target.closest(".list-group-item");
+
+  //Определям ID задачи
+  const id = Number(parentNode.id);
+  const task = tasks.find((task) => task.id === id);
+  task.done = !task.done;
+
   const taskTitle = parentNode.querySelector(".task-title");
   taskTitle.classList.toggle("task-title--done");
+}
+
+function checkEmptyList() {
+  if (tasks.length === 0) {
+    const emptyListHTML = `<li id="emptyList" class="list-group-item empty-list">
+            <img src="./images/leaf.svg" alt="Empty" width="48" class="mt-3" />
+            <div class="empty-list__title">Список дел пуст</div>
+          </li>`;
+    tasksList.insertAdjacentHTML("afterbegin", emptyListHTML);
+  }
+
+  if (tasks.length > 0) {
+    const emptyListEl = document.querySelector("#emptyList");
+    emptyListEl ? emptyListEl.remove() : null;
+  }
 }
